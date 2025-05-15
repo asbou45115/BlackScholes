@@ -25,6 +25,19 @@ class BlackScholes:
         
         return call_price, put_price
             
-if __name__ == "__main__":
-    BS = BlackScholes(31.55, 22.75, 0.05, 3.5, 0.5)
-    BS.calculate()
+st.title("📈 Black-Scholes Option Pricing")
+
+st.sidebar.header("Input Parameters")
+
+spot_price = st.sidebar.slider("Spot Price (S_t)", min_value=0.0, max_value=100.0, value=31.55, step=0.1)
+strike_price = st.sidebar.slider("Strike Price (K)", min_value=0.0, max_value=100.0, value=22.75, step=0.1)
+interest_rate = st.sidebar.slider("Interest Rate (r)", min_value=0.0, max_value=0.2, value=0.05, step=0.005)
+time_to_maturity = st.sidebar.slider("Time to Maturity (t, in years)", min_value=0.1, max_value=10.0, value=3.5, step=0.1)
+volatility = st.sidebar.slider("Volatility (σ)", min_value=0.01, max_value=2.0, value=0.5, step=0.01)
+
+# Calculate price
+bs_model = BlackScholes(spot_price, strike_price, interest_rate, time_to_maturity, volatility)
+call_price, put_price = bs_model.calculate()
+
+st.subheader("🧮 Call Option Price")
+st.success(f"The Black-Scholes Call Option Price is: **${call_price:.2f}**")
