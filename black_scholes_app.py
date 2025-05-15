@@ -75,11 +75,16 @@ st.subheader("P&L Heatmap")
 grid_size = 10
 col6, col7 = st.columns(2)
 with col6:
-    S_min = st.slider("Min Spot Price for Heatmap", min_value=1.0, max_value=S, value=float(S * 0.8))
+    S_min = st.slider("Min Spot Price for Heatmap", min_value=1.0, max_value=S, value=S)
     S_max = st.slider("Max Spot Price for Heatmap", min_value=S, max_value=S * 2, value=float(S * 1.2))
 with col7:
-    sigma_min = st.slider("Min Volatility (σ) for Heatmap", min_value=0.01, max_value=sigma, value=float(sigma * 0.5))
-    sigma_max = st.slider("Max Volatility (σ) for Heatmap", min_value=sigma, max_value=sigma * 1.5, value=float(sigma * 1.2))
+    sigma_min = st.slider("Min Volatility (σ) for Heatmap", min_value=0.01, max_value=sigma, value=sigma)
+    if sigma < 1:
+        sigma_max = st.slider("Max Volatility (σ) for Heatmap", min_value=sigma, max_value=1.00, value=float(sigma * 1.2))
+    else:
+        sigma_max = st.slider("Max Volatility (σ) for Heatmap", min_value=sigma, max_value=sigma * 1.5, value=float(sigma * 1.2))
+
+num_contracts = st.number_input("Number of Contracts", min_value=1, value=1)
 
 spot_range = np.linspace(S_min, S_max, grid_size)
 vol_range = np.linspace(sigma_min, sigma_max, grid_size)
@@ -91,9 +96,9 @@ def compute_pnl(option_type):
         for j, spot in enumerate(spot_range):
             bs = BlackScholes(spot, K, r, t, vol)
             if option_type == 'call':
-                pnl = bs.call_price() - max(spot - K, 0)
+                pnl = (bs.call_price() - spot + K) * num_contracts
             elif option_type == 'put':  
-                pnl = bs.put_price() - max(K - spot, 0)
+                pnl = (bs.put_price() - K + spot) * num_contracts
             matrix[i, j] = pnl
     return matrix
 
