@@ -1,43 +1,100 @@
 import streamlit as st
 import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 from scipy.stats import norm
 
+# ----------- Black-Scholes Pricing ------------
 class BlackScholes:
-    def __init__(self, spot_price, strike_price, interest_rate, time_to_maturity, volatility):
-        self.S_t = spot_price
-        self.K = strike_price
-        self.r = interest_rate
-        self.t = time_to_maturity
-        self.sigma = volatility
-        
-    def calculate(self):
-        S_t = self.S_t
-        K = self.K
-        r = self.r
-        t = self.t
-        sigma = self.sigma
-        
-        d1 = (np.log(S_t / K) + (r + (sigma ** 2 / 2)) * t) / (sigma * np.sqrt(t))
-        d2 = d1 - sigma * np.sqrt(t)
-        
-        call_price = norm.cdf(d1) * S_t - norm.cdf(d2) * K * np.exp(-r * t)
-        put_price = norm.cdf(-d2) * K * np.exp(-r * t) - norm.cdf(-d1) * S_t
-        
-        return call_price, put_price
-            
-st.title("📈 Black-Scholes Option Pricing")
+    def __init__(self, S, K, r, t, sigma):
+        self.S = S
+        self.K = K
+        self.r = r
+        self.t = t
+        self.sigma = sigma
 
-st.sidebar.header("Input Parameters")
+    def d1(self):
+        return (np.log(self.S / self.K) + (self.r + 0.5 * self.sigma ** 2) * self.t) / (self.sigma * np.sqrt(self.t))
 
-spot_price = st.sidebar.slider("Spot Price (S_t)", min_value=0.0, max_value=100.0, value=31.55, step=0.1)
-strike_price = st.sidebar.slider("Strike Price (K)", min_value=0.0, max_value=100.0, value=22.75, step=0.1)
-interest_rate = st.sidebar.slider("Interest Rate (r)", min_value=0.0, max_value=0.2, value=0.05, step=0.005)
-time_to_maturity = st.sidebar.slider("Time to Maturity (t, in years)", min_value=0.1, max_value=10.0, value=3.5, step=0.1)
-volatility = st.sidebar.slider("Volatility (σ)", min_value=0.01, max_value=2.0, value=0.5, step=0.01)
+    def d2(self):
+        return self.d1() - self.sigma * np.sqrt(self.t)
 
-# Calculate price
-bs_model = BlackScholes(spot_price, strike_price, interest_rate, time_to_maturity, volatility)
-call_price, put_price = bs_model.calculate()
+    def call_price(self):
+        d1, d2 = self.d1(), self.d2()
+        return self.S * norm.cdf(d1) - self.K * np.exp(-self.r * self.t) * norm.cdf(d2)
 
-st.subheader("🧮 Call Option Price")
-st.success(f"The Black-Scholes Call Option Price is: **${call_price:.2f}**")
+    def put_price(self):
+        d1, d2 = self.d1(), self.d2()
+        return self.K * np.exp(-self.r * self.t) * norm.cdf(-d2) - self.S * norm.cdf(-d1)
+
+# ----------- Streamlit UI ------------
+st.set_page_config(layout="wide")
+st.markdown("<h1 style='text-align: center;'>🧮 Black-Scholes Pricing Model</h1>", unsafe_allow_html=True)
+
+# Input columns
+col1, col2, col3, col4, col5 = st.columns(5)
+with col1:
+    S = st.number_input("Current Asset Price", value=120.0, format="%.4f")
+with col2:
+    K = st.number_input("Strike Price", value=130.0, format="%.4f")
+with col3:
+    t = st.number_input("Time to Maturity (Years)", value=1.0, format="%.4f")
+with col4:
+    sigma = st.number_input("Volatility (σ)", value=0.2, format="%.4f")
+with col5:
+    r = st.number_input("Risk-Free Interest Rate", value=0.05, format="%.4f")
+
+# Compute values
+bs = BlackScholes(S, K, r, t, sigma)
+call_val = bs.call_price()
+put_val = bs.put_price()
+
+# Display result boxes
+c1, c2 = st.columns(2)
+with c1:
+    st.markdown(
+        f"<div style='background-color:#b5f7b4;padding:20px;border-radius:10px;text-align:center;'>"
+        f"<h3>CALL Value</h3><h1 style='color:green;'>${call_val:.2f}</h1></div>",
+        unsafe_allow_html=True
+    )
+with c2:
+    st.markdown(
+        f"<div style='background-color:#f7c4c4;padding:20px;border-radius:10px;text-align:center;'>"
+        f"<h3>PUT Value</h3><h1 style='color:red;'>${put_val:.2f}</h1></div>",
+        unsafe_allow_html=True
+    )
+
+# ---------- PNL Heatmap ----------
+st.subheader("📊 PNL Heatmap vs Volatility and Asset Price")
+
+contracts = st.number_input("Number of Contracts", value=1, step=1)
+position_type = st.selectbox("Position Type", ["Long Call", "Short Call", "Long Put", "Short Put"])
+
+# Generate heatmap data
+spot_range = np.linspace(S * 0.5, S * 1.5, 50)
+vol_range = np.linspace(0.01, 1.0, 50)
+
+pnl_matrix = np.zeros((len(vol_range), len(spot_range)))
+
+for i, vol in enumerate(vol_range):
+    for j, spot in enumerate(spot_range):
+        bs = BlackScholes(spot, K, r, t, vol)
+        if position_type == "Long Call":
+            pnl = (spot - K) * contracts - bs.call_price() * contracts
+        elif position_type == "Short Call":
+            pnl = bs.call_price() * contracts - (spot - K) * contracts
+        elif position_type == "Long Put":
+            pnl = (K - spot) * contracts - bs.put_price() * contracts
+        else:  # Short Put
+            pnl = bs.put_price() * contracts - (K - spot) * contracts
+        pnl_matrix[i, j] = pnl
+
+# Convert to DataFrame for Seaborn
+df = pd.DataFrame(pnl_matrix, index=np.round(vol_range, 2), columns=np.round(spot_range, 2))
+
+fig, ax = plt.subplots(figsize=(10, 6))
+sns.heatmap(df, cmap="coolwarm", cbar_kws={'label': 'PNL'}, ax=ax)
+ax.set_xlabel("Spot Price")
+ax.set_ylabel("Volatility (σ)")
+st.pyplot(fig)
