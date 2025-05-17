@@ -92,7 +92,7 @@ vol_range = np.linspace(sigma_min, sigma_max, grid_size)
 # Compute PNL Matrices
 def compute_pnl(option_type):
     matrix = np.zeros((grid_size, grid_size))
-    for i, vol in enumerate(vol_range):
+    for i in enumerate(vol_range):
         for j, spot in enumerate(spot_range):
             if option_type == 'call':
                 pnl = ((spot - K) - call_val) * num_contracts * 100
