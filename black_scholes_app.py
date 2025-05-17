@@ -94,12 +94,11 @@ def compute_pnl(option_type):
     matrix = np.zeros((grid_size, grid_size))
     for i, vol in enumerate(vol_range):
         for j, spot in enumerate(spot_range):
-            bs = BlackScholes(spot, K, r, t, vol)
             if option_type == 'call':
-                pnl = (max(spot - K, 0) - bs.call_price()) * num_contracts * 100
+                pnl = ((spot - K) - call_val) * num_contracts * 100
             elif option_type == 'put':  
-                pnl = (max((K - spot), 0) - bs.put_price()) * num_contracts * 100
-            
+                pnl = ((K - spot) - put_val) * num_contracts * 100
+
             matrix[i, j] = pnl
     return matrix
 
