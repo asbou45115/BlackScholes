@@ -84,7 +84,7 @@ with col7:
     else:
         sigma_max = st.slider("Max Volatility (σ) for Heatmap", min_value=sigma, max_value=sigma * 1.5, value=float(sigma * 1.2))
 
-num_contracts = st.number_input("Number of Contracts", min_value=1, value=1)
+num_contracts = st.number_input("Number of Contracts (x100)", min_value=1, value=1)
 
 spot_range = np.linspace(S_min, S_max, grid_size)
 vol_range = np.linspace(sigma_min, sigma_max, grid_size)
@@ -96,9 +96,10 @@ def compute_pnl(option_type):
         for j, spot in enumerate(spot_range):
             bs = BlackScholes(spot, K, r, t, vol)
             if option_type == 'call':
-                pnl = (bs.call_price() - spot + K) * num_contracts
+                pnl = (max(spot - K, 0) - bs.call_price()) * num_contracts * 100
             elif option_type == 'put':  
-                pnl = (bs.put_price() - K + spot) * num_contracts
+                pnl = (max((K - spot), 0) - bs.put_price()) * num_contracts * 100
+            
             matrix[i, j] = pnl
     return matrix
 
@@ -108,7 +109,7 @@ put_pnl = compute_pnl('put')
 # Plot heatmaps
 def plot_heatmap(data, title):
     df = pd.DataFrame(data, index=np.round(vol_range, 2), columns=np.round(spot_range, 2))
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(14, 10))
     sns.heatmap(df, annot=True, fmt=".2f", cmap="RdYlGn", cbar_kws={'label': 'P&L'}, ax=ax)
     ax.set_title(title)
     ax.set_xlabel("Spot Price")
