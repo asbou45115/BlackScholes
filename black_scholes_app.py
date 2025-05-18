@@ -7,6 +7,13 @@ from scipy.stats import norm
 
 # ----------- Black-Scholes Pricing ------------
 class BlackScholes:
+    '''
+    S: spot price,
+    K: strike price,
+    r: risk-free interest rate,
+    t: time to maturity,
+    sigma: volatility
+    '''
     def __init__(self, S, K, r, t, sigma):
         self.S = S
         self.K = K
@@ -94,6 +101,7 @@ def compute_pnl(option_type):
     matrix = np.zeros((grid_size, grid_size))
     for i, vol in enumerate(vol_range):
         for j, spot in enumerate(spot_range):
+            bs = BlackScholes(spot, K, r, t, vol)
             if option_type == 'call':
                 pnl = ((spot - K) - bs.call_price()) * num_contracts * 100
             elif option_type == 'put':  
