@@ -23,7 +23,7 @@ def display_heatmap(matrix, risk_display_type, max_risk, option_type, spot_range
                 cbar_kws={'label': cbar_label}, ax=ax, linewidths=0.2, 
                 center=0 if risk_display_type == "% of Maximum Risk" else entry_cost)
 
-    st.write(f'{option_type} Entry cost: {entry_cost:.2f}')
+    st.write(f'`{option_type} Entry cost: {entry_cost:.2f}`')
     title = f"{option_type} Option P&L - Spot Price vs Date"
     if risk_display_type == "% of Maximum Risk":
         title += " (% of Max Risk)"
