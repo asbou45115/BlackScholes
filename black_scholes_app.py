@@ -10,8 +10,8 @@ from st_ui import create_ui
 # ----------- Streamlit UI ------------
 S, K, t, sigma, r = create_ui()
 
-# ----------- New Date-Strike P&L Heatmap ------------
-st.subheader("P&L Heatmap by Strike and Date")
+# ----------- New Date-Spot P&L Heatmap ------------
+st.subheader("P&L Heatmap by Spot price and Date")
 
 # Set date range
 today = datetime.now().date()

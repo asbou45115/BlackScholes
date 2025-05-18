@@ -13,15 +13,15 @@ def create_ui():
     # Input Fields for Single Calculation
     col1, col2, col3, col4, col5 = st.columns(5)
     with col1:
-        S = st.number_input("Spot Price", value=120.0)
+        S = st.number_input("Spot Price", value=120.0, step=1.0)
     with col2:
-        K = st.number_input("Strike Price", value=130.0)
+        K = st.number_input("Strike Price", value=130.0, step=1.0)
     with col3:
-        t = st.number_input("Time to Maturity (Years)", value=1.0)
+        t = st.number_input("Time to Maturity (Years)", value=1.0, step=1.0)
     with col4:
-        sigma = st.number_input("Volatility (σ)", value=0.2)
+        sigma = st.number_input("Volatility (σ)", value=0.2, step=0.01)
     with col5:
-        r = st.number_input("Risk-Free Interest Rate", value=0.05)
+        r = st.number_input("Risk-Free Interest Rate", value=0.05, step=0.01)
 
     # Calculate Black-Scholes prices
     bs = BlackScholes(S, K, r, t, sigma)
