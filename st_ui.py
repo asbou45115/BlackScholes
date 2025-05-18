@@ -23,6 +23,14 @@ def create_ui():
     with col5:
         r = st.number_input("Risk-Free Interest Rate", value=0.05, step=0.01)
 
+    st.info(
+        '''
+        - Change the variables above to calculate the call and put values using the Black Scholes model
+        - Changing the variables above also changes the heatmap below which calculates theoretical profits over 
+        the time to maturity provided
+        '''
+    )
+
     # Calculate Black-Scholes prices
     bs = BlackScholes(S, K, r, t, sigma)
     call_val = bs.call_price()

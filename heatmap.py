@@ -84,8 +84,8 @@ def create_matrix(start_date, days_diff, grid_size, expiration_date, num_contrac
             calculate_matrix(grid_size, expiration_date, start_date, S, K, r, 
                              sigma, option_type, spot_range, date_range, num_contracts, risk_display_type)
 
-def render_heatmap(S, K, sigma, r):
-    st.subheader("P&L Heatmap by Spot price and Date")
+def render_heatmap(S, K, t, sigma, r):
+    st.title("P&L Heatmap by Spot price and Date")
 
     # Set date range
     today = datetime.now().date()
@@ -93,7 +93,7 @@ def render_heatmap(S, K, sigma, r):
     with col_date1:
         start_date = st.date_input("Start Date", today)
     with col_date2:
-        expiration_date = st.date_input("Expiration Date", today + timedelta(days=365))
+        expiration_date = st.date_input("Expiration Date", today + timedelta(days= t * 365))
 
     # Set spot price range
     grid_size = 15  # Number of steps in the grid
