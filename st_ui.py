@@ -8,7 +8,7 @@ def create_ui():
         layout='wide'
         )
 
-    st.title("Black-Scholes Options Pricing")
+    st.title("📊 Black-Scholes Options Pricing")
 
     # Input Fields for Single Calculation
     col1, col2, col3, col4, col5 = st.columns(5)

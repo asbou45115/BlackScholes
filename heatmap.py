@@ -79,13 +79,17 @@ def create_matrix(start_date, days_diff, grid_size, expiration_date, num_contrac
     # Create columns for call and put
     col1, col2 = st.columns(2)
 
-    for option_type, col in zip(["Call", "Put"], [col1, col2]):
+    for option_type, col in zip(['Call', 'Put'], [col1, col2]):
         with col:
+            if option_type == 'Call':
+                st.subheader("📈 Call P&L")
+            else:
+                st.subheader("📉 Put P&L")
             calculate_matrix(grid_size, expiration_date, start_date, S, K, r, 
                              sigma, option_type, spot_range, date_range, num_contracts, risk_display_type)
 
 def render_heatmap(S, K, t, sigma, r):
-    st.title("P&L Heatmap by Spot price and Date")
+    st.title("🗺️ P&L Heatmap by Spot price and Date")
 
     # Set date range
     today = datetime.now().date()
