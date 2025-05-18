@@ -32,8 +32,8 @@ with col_spot2:
 spot_range = np.linspace(min_spot, max_spot, grid_size)
 
 # Calculation parameters
+num_contracts = st.slider("Number of Contracts (x100)", min_value=1, max_value=1000, value=1, step=1)
 risk_display_type = st.radio("Display", ["P&L Values", "% of Maximum Risk"], horizontal=True)
-num_contracts = st.number_input("Number of Contracts (x100)", min_value=1, value=1)
 
 days_diff = (expiration_date - start_date).days
 if days_diff <= 0:
@@ -105,11 +105,17 @@ else:
             plt.yticks(rotation=0)
             st.pyplot(fig)
 
-            
-    # Additional information
     with st.expander("Interpretation Help"):
         st.write("""
         ### How to read this heatmap:
         
-
-         """)
+        - Each cell shows the P&L for the option at a specific spot price (current value of asset) and date.
+        - The initial option price is calculated based on the parameters you set above using a Black Scholes model.
+        - For dates before expiration, the P&L is calculated as the difference between the option's price on that date and the initial price.
+        - At expiration, the P&L is calculated as the difference between the option's intrinsic value and the initial price.
+        - Red cells indicate losses, green cells indicate profits.
+        
+        ### DISCLAIMER: 
+        
+        This model is for educational purposes only and should not be used as financial advice
+        """)
