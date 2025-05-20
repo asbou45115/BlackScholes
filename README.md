@@ -3,7 +3,7 @@
 Check out the project at [black-scholes-asbou45115.streamlit.app](https://black-scholes-asbou45115.streamlit.app)
 
 ### 📈 Black-Scholes Option P&L Heatmap
-This is a Streamlit app that visualizes the Profit & Loss (P&L) of call and put options across a range of spot prices and dates using the Black-Scholes model.
+This is a Streamlit app that visualises the Profit & Loss (P&L) of call and put options across a range of spot prices and dates using the Black-Scholes model.
 
 🚀 Features
 - 📅 Select custom start and expiration dates
